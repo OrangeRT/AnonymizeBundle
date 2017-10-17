@@ -24,10 +24,10 @@ services:
     public: false
 
   orange_rt_anonymize.metadata.processor:
-    class: OrangeRT\AnonymizeBundle\AnonymizeProcessor
+    class: OrangeRT\AnonymizeBundle\Processor\AnonymizeProcessor
     arguments:
       - '@orange_rt_anonymize.metadata.factory'
     public: true
 
   # AutoWiring
-  OrangeRT\AnonymizeBundle\AnonymizeProcessor: '@orange_rt_anonymize.metadata.processor'
+  OrangeRT\AnonymizeBundle\Processor\AnonymizeProcessor: '@orange_rt_anonymize.metadata.processor'

@@ -7,8 +7,8 @@ namespace OrangeRT\AnonymizeBundle\Command;
 
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use OrangeRT\AnonymizeBundle\AnonymizeProcessor;
-use OrangeRT\AnonymizeBundle\AnonymizeStopwatchProcessor;
+use OrangeRT\AnonymizeBundle\Processor\AnonymizeProcessor;
+use OrangeRT\AnonymizeBundle\Processor\AnonymizeStopwatchProcessor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
