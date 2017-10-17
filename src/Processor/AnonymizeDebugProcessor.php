@@ -11,8 +11,6 @@ use Metadata\MetadataFactoryInterface;
 
 class AnonymizeDebugProcessor implements IAnonymizer
 {
-    const BATCH_SIZE = 500;
-
     /**
      * @var MetadataFactoryInterface
      */

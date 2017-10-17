@@ -12,8 +12,6 @@ use OrangeRT\AnonymizeBundle\Metadata\AnonymizedClassMetadata;
 
 class AnonymizeProcessor implements IAnonymizer
 {
-    const BATCH_SIZE = 500;
-
     /**
      * @var MetadataFactoryInterface
      */

@@ -13,7 +13,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class AnonymizeStopwatchProcessor implements IAnonymizer
 {
-    const BATCH_SIZE = 500;
     const STOPWATCH_EVENT = 'Processing entities';
 
     /**
