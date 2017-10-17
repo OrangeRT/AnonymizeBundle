@@ -15,10 +15,19 @@
         "symfony/dependency-injection": "~2.7|~3.0|~4.0",
         "nyholm/symfony-bundle-test": "^1.2",
         "phpunit/phpunit": "^6.4",
-        "doctrine/annotations": "^1.5"
+        "doctrine/annotations": "^1.5",
+        "jms/metadata": "^1.6",
+        "fzaninotto/faker": "^1.7"
     },
     "require-dev": {},
     "autoload": {
-        "psr-4": { "OrangeRT\\AnonymizeBundle\\": ["src", "tests"] }
+        "psr-4": { "OrangeRT\\AnonymizeBundle\\": "src" }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OrangeRT\\AnonymizeBundle\\": [
+                "tests"
+            ]
+        }
     }
 }

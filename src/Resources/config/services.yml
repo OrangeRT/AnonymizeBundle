@@ -1,7 +1,33 @@
 parameters:
 #    orange_rt_anonymize.example.class: OrangeRT\AnonymizeBundle\Example
+  orange_rt_anonymize.default_locale: 'nl_NL'
 
 services:
 #    orange_rt_anonymize.example:
 #        class: %orange_rt_anonymize.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
+  orange_rt_anonymize.metadata.annotation_reader:
+    class: OrangeRT\AnonymizeBundle\Driver\AnonymizeDriver
+    arguments:
+      - '@orange_rt_anonymize.metadata.reader'
+      - '%orange_rt_anonymize.default_locale%'
+    public: false
+
+  orange_rt_anonymize.metadata.reader:
+    class: \Doctrine\Common\Annotations\AnnotationReader
+    public: false
+
+  orange_rt_anonymize.metadata.factory:
+    class: Metadata\MetadataFactory
+    arguments:
+      - '@orange_rt_anonymize.metadata.annotation_reader'
+    public: false
+
+  orange_rt_anonymize.metadata.processor:
+    class: OrangeRT\AnonymizeBundle\AnonymizeProcessor
+    arguments:
+      - '@orange_rt_anonymize.metadata.factory'
+    public: true
+
+  # AutoWiring
+  OrangeRT\AnonymizeBundle\AnonymizeProcessor: '@orange_rt_anonymize.metadata.processor'
