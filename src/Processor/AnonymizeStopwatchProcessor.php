@@ -41,13 +41,15 @@ class AnonymizeStopwatchProcessor implements IAnonymizer
     }
 
     public function anonymize(ObjectManager $manager, int $batchSize = self::BATCH_SIZE)
-    {;
+    {
+        $this->stopwatch->start('Anonymizing');
         $this->stopwatch->openSection(self::STOPWATCH_EVENT);
         foreach($manager->getMetadataFactory()->getAllMetadata() as $classMetadata)
         {
             $this->anonymizeClass($manager, $classMetadata->getName(), $batchSize);
         }
         $this->stopwatch->stopSection(self::STOPWATCH_EVENT);
+        $this->stopwatch->stop('Anonymizing');
     }
 
     public function anonymizeClass(ObjectManager $manager, $class, int $batchSize = self::BATCH_SIZE)
