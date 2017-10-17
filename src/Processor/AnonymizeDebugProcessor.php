@@ -3,7 +3,7 @@
  * Copyright (c) 2017.                                                        *
  ******************************************************************************/
 
-namespace OrangeRT\AnonymizeBundle;
+namespace OrangeRT\AnonymizeBundle\Processor;
 
 
 use Doctrine\Common\Persistence\ObjectManager;
