@@ -7,6 +7,7 @@ namespace OrangeRT\AnonymizeBundle\Processor;
 
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Metadata\MetadataFactoryInterface;
 
 class AnonymizeDebugProcessor implements IAnonymizer
@@ -25,11 +26,11 @@ class AnonymizeDebugProcessor implements IAnonymizer
         $this->metadataFactory = $metadataFactory;
     }
 
-    public function anonymize(ObjectManager $manager, int $batchSize = self::BATCH_SIZE)
+    public function anonymize(EntityManagerInterface $manager, int $batchSize = self::BATCH_SIZE)
     {
     }
 
-    public function anonymizeClass(ObjectManager $manager, $class, int $batchSize = self::BATCH_SIZE)
+    public function anonymizeClass(EntityManagerInterface $manager, $class, int $batchSize = self::BATCH_SIZE)
     {
 
     }

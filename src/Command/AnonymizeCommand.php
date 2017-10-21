@@ -36,14 +36,20 @@ class AnonymizeCommand extends ContainerAwareCommand
 
         $watch = $anonymizer->getStopwatch();
 
-        foreach($watch->getSections() as $section)
+        foreach($watch->getSections() as $sectionName => $section)
         {
+            if ($sectionName === '__root__') {
+                continue;
+            }
             $style->section($section->getId());
-            $headers = ['Start', 'End', 'Duration', 'Memory'];
+            $headers = ['Name', 'Start', 'End', 'Duration', 'Memory'];
             $rows = [];
-            foreach($section->getEvents() as $event)
+            foreach($section->getEvents() as $eventName => $event)
             {
-                $rows[] = [$event->getStartTime(), $event->getEndTime(), $event->getDuration(), $event->getMemory()];
+                if ($eventName === '__section__') {
+                    continue;
+                }
+                $rows[] = [$eventName, $event->getStartTime(), $event->getEndTime(), $event->getDuration(), $event->getMemory()];
             }
             $style->table($headers, $rows);
         };

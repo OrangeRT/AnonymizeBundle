@@ -7,6 +7,7 @@ namespace OrangeRT\AnonymizeBundle\Processor;
 
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Metadata\MetadataFactoryInterface;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedClassMetadata;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -33,6 +34,7 @@ class AnonymizeStopwatchProcessor implements IAnonymizer
     {
         $this->stopwatch = new Stopwatch();
         $this->delegate = $anonymizer ?? new AnonymizeProcessor($metadataFactory);
+        $this->metadataFactory = $metadataFactory;
     }
 
     public static function fromAnonymizer(IAnonymizer $anonymizer)
@@ -40,19 +42,19 @@ class AnonymizeStopwatchProcessor implements IAnonymizer
         return new self($anonymizer->getMetadataFactory(), $anonymizer);
     }
 
-    public function anonymize(ObjectManager $manager, int $batchSize = self::BATCH_SIZE)
+    public function anonymize(EntityManagerInterface $manager, int $batchSize = self::BATCH_SIZE)
     {
+        $this->stopwatch->openSection();
         $this->stopwatch->start('Anonymizing');
-        $this->stopwatch->openSection(self::STOPWATCH_EVENT);
         foreach($manager->getMetadataFactory()->getAllMetadata() as $classMetadata)
         {
             $this->anonymizeClass($manager, $classMetadata->getName(), $batchSize);
         }
-        $this->stopwatch->stopSection(self::STOPWATCH_EVENT);
         $this->stopwatch->stop('Anonymizing');
+        $this->stopwatch->stopSection(self::STOPWATCH_EVENT);
     }
 
-    public function anonymizeClass(ObjectManager $manager, $class, int $batchSize = self::BATCH_SIZE)
+    public function anonymizeClass(EntityManagerInterface $manager, $class, int $batchSize = self::BATCH_SIZE)
     {
         $anonymizedData = $this->metadataFactory->getMetadataForClass($class);
         if ($anonymizedData instanceof AnonymizedClassMetadata && (count($anonymizedData->propertyMetadata) > 0 || count($anonymizedData->methodMetadata) > 0))

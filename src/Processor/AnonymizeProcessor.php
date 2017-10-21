@@ -7,8 +7,12 @@ namespace OrangeRT\AnonymizeBundle\Processor;
 
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Metadata\MetadataFactoryInterface;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedClassMetadata;
+use OrangeRT\AnonymizeBundle\Metadata\AnonymizedMethodMetadata;
+use OrangeRT\AnonymizeBundle\Metadata\AnonymizedPropertyMetadata;
 
 class AnonymizeProcessor implements IAnonymizer
 {
@@ -26,12 +30,68 @@ class AnonymizeProcessor implements IAnonymizer
         $this->metadataFactory = $metadataFactory;
     }
 
-    public function anonymize(ObjectManager $manager, int $batchSize = self::BATCH_SIZE)
+    public function anonymize(EntityManagerInterface $manager, int $batchSize = self::BATCH_SIZE)
     {
+        foreach($manager->getMetadataFactory()->getAllMetadata() as $classMetadata)
+        {
+            $this->anonymizeClass($manager, $classMetadata->getName(), $batchSize);
+        }
     }
 
-    public function anonymizeClass(ObjectManager $manager, $class, int $batchSize = self::BATCH_SIZE)
+    public function anonymizeClass(EntityManagerInterface $manager, $class, int $batchSize = self::BATCH_SIZE)
     {
+        /** @var AnonymizedClassMetadata $anonymizedData */
+        $anonymizedData = $this->metadataFactory->getMetadataForClass($class);
+        if (!$anonymizedData) {
+            throw new \RuntimeException("Couldn't load the metadata for class ".$class);
+        }
+        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function($metadata) { return $metadata instanceof AnonymizedPropertyMetadata; });
+        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function($metadata) { return $metadata instanceof AnonymizedMethodMetadata; });
+
+        if (count($anonymizedMethodMetadata) > 0 || count($anonymizedPropertyMetadata) > 0)
+        {
+            /** @var EntityRepository $repository */
+            $repository = $manager->getRepository($class);
+
+            $qb = $repository->createQueryBuilder('c');
+
+            $count = (clone $qb)->select('COUNT(c)')->getQuery()->getSingleScalarResult();
+
+
+            $page = 0;
+            $pages = ceil($count / $batchSize);
+
+            while ($page < $pages) {
+                $objects = (clone $qb)
+                    ->setFirstResult($page * $batchSize)
+                    ->setMaxResults($batchSize)
+                    ->getQuery()
+                    ->getResult();
+
+                foreach ($objects as $object) {
+                    if ($anonymizedData->isCouldExclude()) {
+                        if (!$anonymizedData->shouldInclude($object)) {
+                            echo 'Excluding it all'.PHP_EOL;
+                            continue;
+                        }
+                    }
+                    echo 'Including object'.PHP_EOL;
+                    continue;
+                    /** @var AnonymizedPropertyMetaData $anonymizedProperty */
+                    foreach ($anonymizedPropertyMetadata as $anonymizedProperty) {
+                        $anonymizedProperty->setValue($object);
+                    }
+
+                    /** @var AnonymizedMethodMetadata $anonymizedMethod */
+                    foreach ($anonymizedMethodMetadata as $anonymizedMethod) {
+                        $anonymizedMethod->invoke($object);
+                    }
+                }
+                $manager->flush();
+                $manager->clear();
+                ++$page;
+            }
+        }
     }
 
     public function getMetadataFactory(): MetadataFactoryInterface

@@ -76,14 +76,14 @@ class AnonymizeDriver implements DriverInterface
                     throw new InvalidAnonymizeAnnotationException(sprintf("The expected property %s doesn\'t exist in class %s", $property, $class->getName()));
                 }
             }
-            if (array_count_values($annotation->getInclusions()) > 0) {
+            if (count($annotation->getInclusions()) > 0) {
                 $classMetadata->setMatchers($annotation->getInclusions());
                 $classMetadata->setMethod(AnonymizedClassMetadata::INCLUDE);
             } else {
                 $classMetadata->setMatchers($annotation->getExclusions());
                 $classMetadata->setMethod(AnonymizedClassMetadata::EXCLUDE);
             };
-            $classMetadata->couldExclude(true);
+            $classMetadata->setCouldExclude(true);
         }
     }
 
@@ -101,15 +101,15 @@ class AnonymizeDriver implements DriverInterface
 
             if ($annotation !== null) {
 
-                $factory = $this->createFactory($annotation->getFunction(), $class->getName() . '::' . $reflectionProperty->getName());
+                $factory = $this->createFactory($annotation->getFaker(), $class->getName() . '::' . $reflectionProperty->getName());
 
                 if ($annotation->isUnique()) {
                     $propertyMetadata->setGenerator($factory->unique());
                 } else {
                     $propertyMetadata->setGenerator($factory);
                 }
-                $propertyMetadata->setArguments($annotation->getArguments());
-                $propertyMetadata->setProperty($annotation->getFunction());
+                $propertyMetadata->setArguments($annotation->getFakerArguments());
+                $propertyMetadata->setProperty($annotation->getFaker());
                 $propertyMetadata->setExcluded($annotation->getExcluded());
 
                 $classMetadata->addPropertyMetadata($propertyMetadata);
@@ -139,6 +139,7 @@ class AnonymizeDriver implements DriverInterface
     /**
      * @param \ReflectionClass $class
      * @param ClassMetadata $classMetadata
+     * @throws \InvalidArgumentException
      */
     private function buildMethodMetadata(\ReflectionClass $class, $classMetadata)
     {

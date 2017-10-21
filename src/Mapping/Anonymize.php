@@ -15,7 +15,7 @@ use OrangeRT\AnonymizeBundle\Exception\InvalidAnonymizeAnnotationException;
  * @package OrangeRT\AnonymizeBundle\Mapping
  *
  * @Annotation
- * @Target(value="PROPERTY")
+ * @Target(value={"PROPERTY","METHOD"})
  */
 class Anonymize
 {
