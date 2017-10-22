@@ -155,30 +155,20 @@ class AnonymizeDriver implements DriverInterface
                 foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
                     $type = $reflectionParameter->getType();
                     if ($type === null) {
-                        if (!array_key_exists($reflectionParameter->getName(), $annotation->getArguments())) {
-                            $arguments[$reflectionParameter->getName()] = $annotation->getArguments()[$reflectionParameter->getName()];
-                        } else {
-                            throw new InvalidArgumentException(sprintf('Didn\'t know how to inject class %s for argument %s',
-                                $reflectionParameter->getName(), $reflectionMethod->getName()), 2003);
-                        }
+                        $arguments = $this->lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod);
                     } else {
                         $typeName = $type->getName();
                         if (is_a($typeName, Base::class, true)) {
                             $factory = new $typeName($this->generator);
-                            $arguments[$reflectionParameter->getName()] = $factory;
+                            $arguments[$reflectionParameter->name] = $factory;
                         } else if (is_a($typeName, Generator::class, true)) {
                             $factory = $this->generator;
-                            $arguments[$reflectionParameter->getName()] = $factory;
+                            $arguments[$reflectionParameter->name] = $factory;
                         } else if (is_a($typeName, UniqueGenerator::class, true)) {
                             $factory = $this->generator->unique();
-                            $arguments[$reflectionParameter->getName()] = $factory;
+                            $arguments[$reflectionParameter->name] = $factory;
                         } else {
-                            if (!array_key_exists($reflectionParameter->getName(), $annotation->getArguments())) {
-                                $arguments[$reflectionParameter->getName()] = $annotation->getArguments()[$reflectionParameter->getName()];
-                            } else {
-                                throw new InvalidArgumentException(sprintf('Didn\'t know how to inject class %s for argument %s of %s', $typeName,
-                                    $reflectionParameter->getName(), $reflectionMethod->getName()), 2003);
-                            }
+                            $arguments = $this->lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod);
                         }
                     }
                 }
@@ -188,5 +178,23 @@ class AnonymizeDriver implements DriverInterface
                 $classMetadata->addMethodMetadata($methodMetaData);
             }
         }
+    }
+
+    /**
+     * @param $reflectionParameter
+     * @param $annotation
+     * @param $arguments
+     * @param $reflectionMethod
+     * @return mixed
+     */
+    private function lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod)
+    {
+        if (!array_key_exists($reflectionParameter->name, $annotation->getArguments())) {
+            $arguments[$reflectionParameter->name] = $annotation->getArguments()[$reflectionParameter->name];
+        } else {
+            throw new InvalidArgumentException(sprintf('Didn\'t know how to inject class %s for argument %s',
+                $reflectionParameter->name, $reflectionMethod->name), 2003);
+        }
+        return $arguments;
     }
 }
