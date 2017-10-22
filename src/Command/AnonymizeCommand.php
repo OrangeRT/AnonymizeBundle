@@ -36,15 +36,15 @@ class AnonymizeCommand extends ContainerAwareCommand
             return;
         }
 
-        $em = $doctrine->getManager($input->getOption('em'));
+        $entityManager = $doctrine->getManager($input->getOption('em'));
 
-        if (!$em instanceof EntityManagerInterface) {
-            throw new \RuntimeException('Expected a EntityManagerInterface, got ' . get_class($em));
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new \RuntimeException('Expected a EntityManagerInterface, got ' . get_class($entityManager));
         }
 
         $anonymizer = AnonymizeStopwatchProcessor::fromAnonymizer($this->getContainer()->get('orange_rt_anonymize.metadata.processor'));
 
-        $anonymizer->anonymize($em, $input->getOption('paging'));
+        $anonymizer->anonymize($entityManager, $input->getOption('paging'));
 
         $watch = $anonymizer->getStopwatch();
 
