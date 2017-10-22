@@ -2,7 +2,7 @@
     "name": "orange-rt/anonymize-bundle",
     "description": "A bundle to anonymize sensitive database data",
     "type": "symfony-bundle",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "license": "MIT",
     "authors": [
         {
