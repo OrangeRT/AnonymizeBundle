@@ -12,8 +12,8 @@ use Faker\Generator;
 use Faker\Provider\Base;
 use Faker\UniqueGenerator;
 use InvalidArgumentException;
+use Metadata\ClassMetadata;
 use Metadata\Driver\DriverInterface;
-use Metadata\MergeableClassMetadata;
 use OrangeRT\AnonymizeBundle\Exception\InvalidAnonymizeAnnotationException;
 use OrangeRT\AnonymizeBundle\Exception\InvalidFunctionException;
 use OrangeRT\AnonymizeBundle\Mapping\Anonymize;
@@ -22,7 +22,6 @@ use OrangeRT\AnonymizeBundle\Metadata\AnonymizedClassMetadata;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedMethodMetadata;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedPropertyMetadata;
 use OrangeRT\AnonymizeBundle\Provider\ChuckNorrisProvider;
-use Metadata\ClassMetadata;
 
 class AnonymizeDriver implements DriverInterface
 {
@@ -65,13 +64,13 @@ class AnonymizeDriver implements DriverInterface
         $annotation = $this->reader->getClassAnnotation($class, AnonymizeEntity::class);
 
         if ($annotation !== null) {
-            foreach($annotation->getExclusions() as $property => $regex) {
+            foreach ($annotation->getExclusions() as $property => $regex) {
                 if (!$class->hasProperty($property)) {
                     throw new InvalidAnonymizeAnnotationException(sprintf("The expected property %s doesn\'t exist in class %s", $property, $class->getName()));
                 }
             }
 
-            foreach($annotation->getInclusions() as $property => $regex) {
+            foreach ($annotation->getInclusions() as $property => $regex) {
                 if (!$class->hasProperty($property)) {
                     throw new InvalidAnonymizeAnnotationException(sprintf("The expected property %s doesn\'t exist in class %s", $property, $class->getName()));
                 }

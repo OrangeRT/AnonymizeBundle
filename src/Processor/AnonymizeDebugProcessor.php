@@ -6,7 +6,6 @@
 namespace OrangeRT\AnonymizeBundle\Processor;
 
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Metadata\MetadataFactoryInterface;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedClassMetadata;
@@ -16,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class AnonymizeDebugProcessor implements IAnonymizer
 {
-    /** @var SymfonyStyle  */
+    /** @var SymfonyStyle */
     private $style;
     /**
      * @var MetadataFactoryInterface
@@ -38,8 +37,7 @@ class AnonymizeDebugProcessor implements IAnonymizer
             throw new \RuntimeException('The style is not set, not outputting anything');
         }
 
-        foreach($manager->getMetadataFactory()->getAllMetadata() as $classMetadata)
-        {
+        foreach ($manager->getMetadataFactory()->getAllMetadata() as $classMetadata) {
             $this->anonymizeClass($manager, $classMetadata->getName(), $batchSize);
         }
     }
@@ -49,21 +47,24 @@ class AnonymizeDebugProcessor implements IAnonymizer
         /** @var AnonymizedClassMetadata $anonymizedData */
         $anonymizedData = $this->metadataFactory->getMetadataForClass($class);
         if (!$anonymizedData) {
-            throw new \RuntimeException("Couldn't load the metadata for class ".$class);
+            throw new \RuntimeException("Couldn't load the metadata for class " . $class);
         }
-        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function($metadata) { return $metadata instanceof AnonymizedPropertyMetadata; });
-        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function($metadata) { return $metadata instanceof AnonymizedMethodMetadata; });
+        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function ($metadata) {
+            return $metadata instanceof AnonymizedPropertyMetadata;
+        });
+        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function ($metadata) {
+            return $metadata instanceof AnonymizedMethodMetadata;
+        });
 
         $numProperties = count($anonymizedPropertyMetadata);
         $numMethods = count($anonymizedMethodMetadata);
-        if ($numMethods > 0 || $numProperties > 0)
-        {
+        if ($numMethods > 0 || $numProperties > 0) {
             $this->style->block($class);
             $this->style->section('Class metadata');
 
             $this->style->table(
                 ['Method', 'Matchers'],
-                [[$anonymizedData->getMethod() === 0 ? 'Include' : 'Exclude', implode(', ', array_map(function($value, $key) {
+                [[$anonymizedData->getMethod() === 0 ? 'Include' : 'Exclude', implode(', ', array_map(function ($value, $key) {
                     return sprintf('%s => %s', $key, $value);
                 }, $anonymizedData->getMatchers(), array_keys($anonymizedData->getMatchers())))]]
             );
@@ -73,7 +74,7 @@ class AnonymizeDebugProcessor implements IAnonymizer
 
                 $this->style->table(
                     array('Property', 'Faker', 'FakerMethod', 'Arguments'),
-                    array_map(function(AnonymizedPropertyMetadata $data) {
+                    array_map(function (AnonymizedPropertyMetadata $data) {
                         return [$data->name, get_class($data->getGenerator()), $data->getProperty(), implode(', ', $data->getArguments())];
                     }, $anonymizedPropertyMetadata)
                 );
@@ -83,8 +84,8 @@ class AnonymizeDebugProcessor implements IAnonymizer
                 $this->style->section('Anonymized methods');
                 $this->style->table(
                     array('Method', 'Arguments'),
-                    array_map(function(AnonymizedMethodMetadata $data) {
-                        return [$data->name, implode(', ', array_map(function($obj) {
+                    array_map(function (AnonymizedMethodMetadata $data) {
+                        return [$data->name, implode(', ', array_map(function ($obj) {
                             if (is_object($obj)) {
                                 if (method_exists($obj, '__toString')) {
                                     return $obj->__toString();
