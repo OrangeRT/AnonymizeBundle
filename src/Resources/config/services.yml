@@ -29,5 +29,12 @@ services:
       - '@orange_rt_anonymize.metadata.factory'
     public: true
 
+  orange_rt_anonymize.metadata.processor.debug:
+    class: OrangeRT\AnonymizeBundle\Processor\AnonymizeDebugProcessor
+    arguments:
+      - '@orange_rt_anonymize.metadata.factory'
+    public: true
+
   # AutoWiring
   OrangeRT\AnonymizeBundle\Processor\AnonymizeProcessor: '@orange_rt_anonymize.metadata.processor'
+  OrangeRT\AnonymizeBundle\Processor\AnonymizeDebugProcessor: '@orange_rt_anonymize.metadata.processor.debug'
