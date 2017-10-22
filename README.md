@@ -1,3 +1,5 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/OrangeRT/AnonymizerBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/OrangeRT/AnonymizerBundle/?branch=master)
+
 # Installation
 
 ## Step 1: Download the Bundle
