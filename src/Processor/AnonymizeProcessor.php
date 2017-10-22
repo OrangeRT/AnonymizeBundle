@@ -6,7 +6,6 @@
 namespace OrangeRT\AnonymizeBundle\Processor;
 
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Metadata\MetadataFactoryInterface;
@@ -32,8 +31,7 @@ class AnonymizeProcessor implements IAnonymizer
 
     public function anonymize(EntityManagerInterface $manager, int $batchSize = self::BATCH_SIZE)
     {
-        foreach($manager->getMetadataFactory()->getAllMetadata() as $classMetadata)
-        {
+        foreach ($manager->getMetadataFactory()->getAllMetadata() as $classMetadata) {
             $this->anonymizeClass($manager, $classMetadata->getName(), $batchSize);
         }
     }
@@ -43,13 +41,16 @@ class AnonymizeProcessor implements IAnonymizer
         /** @var AnonymizedClassMetadata $anonymizedData */
         $anonymizedData = $this->metadataFactory->getMetadataForClass($class);
         if (!$anonymizedData) {
-            throw new \RuntimeException("Couldn't load the metadata for class ".$class);
+            throw new \RuntimeException("Couldn't load the metadata for class " . $class);
         }
-        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function($metadata) { return $metadata instanceof AnonymizedPropertyMetadata; });
-        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function($metadata) { return $metadata instanceof AnonymizedMethodMetadata; });
+        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function ($metadata) {
+            return $metadata instanceof AnonymizedPropertyMetadata;
+        });
+        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function ($metadata) {
+            return $metadata instanceof AnonymizedMethodMetadata;
+        });
 
-        if (count($anonymizedMethodMetadata) > 0 || count($anonymizedPropertyMetadata) > 0)
-        {
+        if (count($anonymizedMethodMetadata) > 0 || count($anonymizedPropertyMetadata) > 0) {
             /** @var EntityRepository $repository */
             $repository = $manager->getRepository($class);
 

@@ -6,7 +6,6 @@
 namespace OrangeRT\AnonymizeBundle\Processor;
 
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Metadata\MetadataFactoryInterface;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedClassMetadata;
@@ -46,8 +45,7 @@ class AnonymizeStopwatchProcessor implements IAnonymizer
     {
         $this->stopwatch->openSection();
         $this->stopwatch->start('Anonymizing');
-        foreach($manager->getMetadataFactory()->getAllMetadata() as $classMetadata)
-        {
+        foreach ($manager->getMetadataFactory()->getAllMetadata() as $classMetadata) {
             $this->anonymizeClass($manager, $classMetadata->getName(), $batchSize);
         }
         $this->stopwatch->stop('Anonymizing');
@@ -57,8 +55,7 @@ class AnonymizeStopwatchProcessor implements IAnonymizer
     public function anonymizeClass(EntityManagerInterface $manager, $class, int $batchSize = self::BATCH_SIZE)
     {
         $anonymizedData = $this->metadataFactory->getMetadataForClass($class);
-        if ($anonymizedData instanceof AnonymizedClassMetadata && (count($anonymizedData->propertyMetadata) > 0 || count($anonymizedData->methodMetadata) > 0))
-        {
+        if ($anonymizedData instanceof AnonymizedClassMetadata && (count($anonymizedData->propertyMetadata) > 0 || count($anonymizedData->methodMetadata) > 0)) {
             $event = $this->stopwatch->start(sprintf('Anonymizing %s', $class));
             $this->delegate->anonymizeClass($manager, $class, $batchSize);
             $event->stop();

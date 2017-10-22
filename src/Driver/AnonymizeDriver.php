@@ -12,8 +12,8 @@ use Faker\Generator;
 use Faker\Provider\Base;
 use Faker\UniqueGenerator;
 use InvalidArgumentException;
+use Metadata\ClassMetadata;
 use Metadata\Driver\DriverInterface;
-use Metadata\MergeableClassMetadata;
 use OrangeRT\AnonymizeBundle\Exception\InvalidAnonymizeAnnotationException;
 use OrangeRT\AnonymizeBundle\Exception\InvalidFunctionException;
 use OrangeRT\AnonymizeBundle\Mapping\Anonymize;
@@ -22,7 +22,6 @@ use OrangeRT\AnonymizeBundle\Metadata\AnonymizedClassMetadata;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedMethodMetadata;
 use OrangeRT\AnonymizeBundle\Metadata\AnonymizedPropertyMetadata;
 use OrangeRT\AnonymizeBundle\Provider\ChuckNorrisProvider;
-use Metadata\ClassMetadata;
 
 class AnonymizeDriver implements DriverInterface
 {
@@ -65,13 +64,13 @@ class AnonymizeDriver implements DriverInterface
         $annotation = $this->reader->getClassAnnotation($class, AnonymizeEntity::class);
 
         if ($annotation !== null) {
-            foreach($annotation->getExclusions() as $property => $regex) {
+            foreach ($annotation->getExclusions() as $property => $regex) {
                 if (!$class->hasProperty($property)) {
                     throw new InvalidAnonymizeAnnotationException(sprintf("The expected property %s doesn\'t exist in class %s", $property, $class->getName()));
                 }
             }
 
-            foreach($annotation->getInclusions() as $property => $regex) {
+            foreach ($annotation->getInclusions() as $property => $regex) {
                 if (!$class->hasProperty($property)) {
                     throw new InvalidAnonymizeAnnotationException(sprintf("The expected property %s doesn\'t exist in class %s", $property, $class->getName()));
                 }
@@ -146,40 +145,30 @@ class AnonymizeDriver implements DriverInterface
         foreach ($class->getMethods() as $reflectionMethod) {
             $methodMetaData = new AnonymizedMethodMetadata($class->getName(), $reflectionMethod->getName());
 
+            /** @var AnonymizedMethodMetadata $annotation */
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, Anonymize::class);
 
             if ($annotation !== null) {
-
                 $factory = null;
                 $parameter = null;
                 $arguments = [];
                 foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
                     $type = $reflectionParameter->getType();
                     if ($type === null) {
-                        if (!array_key_exists($reflectionParameter->getName(), $annotation->getArguments())) {
-                            $arguments[$reflectionParameter->getName()] = $annotation->getArguments()[$reflectionParameter->getName()];
-                        } else {
-                            throw new InvalidArgumentException(sprintf('Didn\'t know how to inject class %s for argument %s',
-                                $reflectionParameter->getName(), $reflectionMethod->getName()), 2003);
-                        }
+                        $arguments = $this->lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod);
                     } else {
                         $typeName = $type->getName();
                         if (is_a($typeName, Base::class, true)) {
                             $factory = new $typeName($this->generator);
-                            $arguments[$reflectionParameter->getName()] = $factory;
+                            $arguments[$reflectionParameter->name] = $factory;
                         } else if (is_a($typeName, Generator::class, true)) {
                             $factory = $this->generator;
-                            $arguments[$reflectionParameter->getName()] = $factory;
+                            $arguments[$reflectionParameter->name] = $factory;
                         } else if (is_a($typeName, UniqueGenerator::class, true)) {
                             $factory = $this->generator->unique();
-                            $arguments[$reflectionParameter->getName()] = $factory;
+                            $arguments[$reflectionParameter->name] = $factory;
                         } else {
-                            if (!array_key_exists($reflectionParameter->getName(), $annotation->getArguments())) {
-                                $arguments[$reflectionParameter->getName()] = $annotation->getArguments()[$reflectionParameter->getName()];
-                            } else {
-                                throw new InvalidArgumentException(sprintf('Didn\'t know how to inject class %s for argument %s of %s', $typeName,
-                                    $reflectionParameter->getName(), $reflectionMethod->getName()), 2003);
-                            }
+                            $arguments = $this->lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod);
                         }
                     }
                 }
@@ -189,5 +178,24 @@ class AnonymizeDriver implements DriverInterface
                 $classMetadata->addMethodMetadata($methodMetaData);
             }
         }
+    }
+
+    /**
+     * @param \ReflectionParameter $reflectionParameter
+     * @param AnonymizedMethodMetadata $annotation
+     * @param array $arguments
+     * @param \ReflectionMethod $reflectionMethod
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    private function lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod): array
+    {
+        if (!array_key_exists($reflectionParameter->name, $annotation->getArguments())) {
+            $arguments[$reflectionParameter->name] = $annotation->getArguments()[$reflectionParameter->name];
+        } else {
+            throw new InvalidArgumentException(sprintf('Didn\'t know how to inject class %s for argument %s',
+                $reflectionParameter->name, $reflectionMethod->name), 2003);
+        }
+        return $arguments;
     }
 }
