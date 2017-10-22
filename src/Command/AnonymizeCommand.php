@@ -42,7 +42,7 @@ class AnonymizeCommand extends ContainerAwareCommand
             throw new \RuntimeException('Expected a EntityManagerInterface, got ' . get_class($em));
         }
 
-        $anonymizer = AnonymizeStopwatchProcessor::fromAnonymizer($this->getContainer()->get('orange_rt_anonymize.metadata.processor.debug'));
+        $anonymizer = AnonymizeStopwatchProcessor::fromAnonymizer($this->getContainer()->get('orange_rt_anonymize.metadata.processor'));
 
         $anonymizer->anonymize($em, $input->getOption('paging'));
 

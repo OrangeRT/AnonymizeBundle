@@ -69,14 +69,9 @@ class AnonymizeProcessor implements IAnonymizer
                     ->getResult();
 
                 foreach ($objects as $object) {
-                    if ($anonymizedData->isCouldExclude()) {
-                        if (!$anonymizedData->shouldInclude($object)) {
-                            echo 'Excluding it all'.PHP_EOL;
-                            continue;
-                        }
+                    if ($anonymizedData->isCouldExclude() && !$anonymizedData->shouldInclude($object)) {
+                        continue;
                     }
-                    echo 'Including object'.PHP_EOL;
-                    continue;
                     /** @var AnonymizedPropertyMetaData $anonymizedProperty */
                     foreach ($anonymizedPropertyMetadata as $anonymizedProperty) {
                         $anonymizedProperty->setValue($object);
