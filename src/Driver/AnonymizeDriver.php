@@ -145,10 +145,10 @@ class AnonymizeDriver implements DriverInterface
         foreach ($class->getMethods() as $reflectionMethod) {
             $methodMetaData = new AnonymizedMethodMetadata($class->getName(), $reflectionMethod->getName());
 
+            /** @var AnonymizedMethodMetadata $annotation */
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, Anonymize::class);
 
             if ($annotation !== null) {
-
                 $factory = null;
                 $parameter = null;
                 $arguments = [];
@@ -181,13 +181,14 @@ class AnonymizeDriver implements DriverInterface
     }
 
     /**
-     * @param $reflectionParameter
-     * @param $annotation
-     * @param $arguments
-     * @param $reflectionMethod
-     * @return mixed
+     * @param \ReflectionParameter $reflectionParameter
+     * @param AnonymizedMethodMetadata $annotation
+     * @param array $arguments
+     * @param \ReflectionMethod $reflectionMethod
+     * @return array
+     * @throws \InvalidArgumentException
      */
-    private function lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod)
+    private function lookupParameter($reflectionParameter, $annotation, $arguments, $reflectionMethod): array
     {
         if (!array_key_exists($reflectionParameter->name, $annotation->getArguments())) {
             $arguments[$reflectionParameter->name] = $annotation->getArguments()[$reflectionParameter->name];
