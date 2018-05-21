@@ -41,12 +41,12 @@ class AnonymizeProcessor implements IAnonymizer
         /** @var AnonymizedClassMetadata $anonymizedData */
         $anonymizedData = $this->metadataFactory->getMetadataForClass($class);
         if (!$anonymizedData) {
-            throw new \RuntimeException("Couldn't load the metadata for class " . $class);
+            throw new \RuntimeException("Couldn't load the metadata for class ".$class);
         }
-        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function ($metadata) {
+        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function($metadata) {
             return $metadata instanceof AnonymizedPropertyMetadata;
         });
-        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function ($metadata) {
+        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function($metadata) {
             return $metadata instanceof AnonymizedMethodMetadata;
         });
 

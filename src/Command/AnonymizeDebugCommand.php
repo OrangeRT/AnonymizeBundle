@@ -28,7 +28,7 @@ class AnonymizeDebugCommand extends ContainerAwareCommand
         $entityManager = $doctrine->getManager($input->getOption('em'));
 
         if (!$entityManager instanceof EntityManagerInterface) {
-            throw new \RuntimeException('Expected a EntityManagerInterface, got ' . get_class($entityManager));
+            throw new \RuntimeException('Expected a EntityManagerInterface, got '.get_class($entityManager));
         }
 
         $anonymizer = $this->getContainer()->get('orange_rt_anonymize.metadata.processor.debug');
