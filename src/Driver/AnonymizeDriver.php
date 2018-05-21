@@ -100,7 +100,7 @@ class AnonymizeDriver implements DriverInterface
 
             if ($annotation !== null) {
 
-                $factory = $this->createFactory($annotation->getFaker(), $class->getName() . '::' . $reflectionProperty->getName());
+                $factory = $this->createFactory($annotation->getFaker(), $class->getName().'::'.$reflectionProperty->getName());
 
                 if ($annotation->isUnique()) {
                     $propertyMetadata->setGenerator($factory->unique());

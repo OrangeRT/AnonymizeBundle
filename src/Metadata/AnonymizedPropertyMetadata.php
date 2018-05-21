@@ -41,7 +41,7 @@ class AnonymizedPropertyMetadata extends PropertyMetadata
             if ($this->getValue($obj) === null) {
                 return;
             }
-            $originalValue = (string)$this->getValue($obj);
+            $originalValue = (string) $this->getValue($obj);
             foreach ($this->excluded as $item) {
                 if (preg_match($item, $originalValue)) {
                     return;

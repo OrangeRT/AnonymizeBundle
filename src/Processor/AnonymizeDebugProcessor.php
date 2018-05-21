@@ -47,12 +47,12 @@ class AnonymizeDebugProcessor implements IAnonymizer
         /** @var AnonymizedClassMetadata $anonymizedData */
         $anonymizedData = $this->metadataFactory->getMetadataForClass($class);
         if (!$anonymizedData) {
-            throw new \RuntimeException("Couldn't load the metadata for class " . $class);
+            throw new \RuntimeException("Couldn't load the metadata for class ".$class);
         }
-        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function ($metadata) {
+        $anonymizedPropertyMetadata = array_filter($anonymizedData->propertyMetadata, function($metadata) {
             return $metadata instanceof AnonymizedPropertyMetadata;
         });
-        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function ($metadata) {
+        $anonymizedMethodMetadata = array_filter($anonymizedData->methodMetadata, function($metadata) {
             return $metadata instanceof AnonymizedMethodMetadata;
         });
 
@@ -64,7 +64,7 @@ class AnonymizeDebugProcessor implements IAnonymizer
 
             $this->style->table(
                 ['Method', 'Matchers'],
-                [[$anonymizedData->getMethod() === 0 ? 'Include' : 'Exclude', implode(', ', array_map(function ($value, $key) {
+                [[$anonymizedData->getMethod() === 0 ? 'Include' : 'Exclude', implode(', ', array_map(function($value, $key) {
                     return sprintf('%s => %s', $key, $value);
                 }, $anonymizedData->getMatchers(), array_keys($anonymizedData->getMatchers())))]]
             );
@@ -74,7 +74,7 @@ class AnonymizeDebugProcessor implements IAnonymizer
 
                 $this->style->table(
                     array('Property', 'Faker', 'FakerMethod', 'Arguments'),
-                    array_map(function (AnonymizedPropertyMetadata $data) {
+                    array_map(function(AnonymizedPropertyMetadata $data) {
                         return [$data->name, get_class($data->getGenerator()), $data->getProperty(), implode(', ', $data->getArguments())];
                     }, $anonymizedPropertyMetadata)
                 );
@@ -84,8 +84,8 @@ class AnonymizeDebugProcessor implements IAnonymizer
                 $this->style->section('Anonymized methods');
                 $this->style->table(
                     array('Method', 'Arguments'),
-                    array_map(function (AnonymizedMethodMetadata $data) {
-                        return [$data->name, implode(', ', array_map(function ($obj) {
+                    array_map(function(AnonymizedMethodMetadata $data) {
+                        return [$data->name, implode(', ', array_map(function($obj) {
                             if (is_object($obj)) {
                                 if (method_exists($obj, '__toString')) {
                                     return $obj->__toString();
